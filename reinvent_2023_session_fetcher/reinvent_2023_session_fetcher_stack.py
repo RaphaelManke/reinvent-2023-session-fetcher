@@ -5,15 +5,19 @@ from aws_cdk import (
 )
 from constructs import Construct
 
-class Reinvent2023SessionFetcherStack(Stack):
+from reinvent_2023_session_fetcher.app_constructs.storage import Storage
+from reinvent_2023_session_fetcher.app_constructs.fetcher import Fetcher
 
+
+class Reinvent2023SessionFetcherStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # The code that defines your stack goes here
+        Storage(
+            scope=self,
+            id="Storage",
+        )
 
-        # example resource
-        # queue = sqs.Queue(
-        #     self, "Reinvent2023SessionFetcherQueue",
-        #     visibility_timeout=Duration.seconds(300),
-        # )
+        Fetcher(scope=self, id="Fetcher")
+
+        # EventGenerator()

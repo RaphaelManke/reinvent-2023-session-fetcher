@@ -1,0 +1,4 @@
+requests==2.31.*
+aws-lambda-powertools==2.22.*
+urllib3<1.27,>=1.25.4
+pydantic==2.1.*

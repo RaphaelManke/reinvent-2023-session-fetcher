@@ -1,1 +1,6 @@
-pytest==6.2.5
+aws-lambda-powertools==2.22.*
+black==23.7.*
+boto3==1.28.*
+pytest==7.4.*
+requests==2.31.*
+pydantic==2.1.*
