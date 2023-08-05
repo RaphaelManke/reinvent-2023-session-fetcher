@@ -50,16 +50,31 @@ class ReInventSession(BaseModel):
         for tag in self.tags:
             if tag.scheduleTagUid in LEVEL_MAPPING:
                 self.level = LEVEL_MAPPING[tag.scheduleTagUid]
+
+            new_tag_name = tag.tagName.strip()
+
+            # Fill lists
             if tag.parentTagUid == PARENT_TAG_UIDS["TOPIC"]:
-                self.topics.append(tag.tagName.strip())
+                if new_tag_name not in self.topics:
+                    self.topics.append(new_tag_name)
+
             if tag.parentTagUid == PARENT_TAG_UIDS["INDUSTRY"]:
-                self.industries.append(tag.tagName.strip())
+                if new_tag_name not in self.industries:
+                    self.industries.append(new_tag_name)
+
             if tag.parentTagUid == PARENT_TAG_UIDS["ROLE"]:
-                self.roles.append(tag.tagName.strip())
+                if new_tag_name not in self.roles:
+                    self.roles.append(new_tag_name)
+
             if tag.parentTagUid == PARENT_TAG_UIDS["AREA_OF_INTEREST"]:
-                self.areas_of_interest.append(tag.tagName.strip())
+                if new_tag_name not in self.areas_of_interest:
+                    self.areas_of_interest.append(new_tag_name)
+
             if tag.parentTagUid == PARENT_TAG_UIDS["SERVICES"]:
-                self.services.append(tag.tagName.strip())
+                if new_tag_name not in self.services:
+                    self.services.append(new_tag_name)
+
+            # Report missing mappings
             if tag.parentTagUid not in PARENT_TAG_UIDS.values():
                 print(f"Did not find Parent tag UID for '{tag.parentTagName}'")
 

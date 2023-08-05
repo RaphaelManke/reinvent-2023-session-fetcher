@@ -124,7 +124,6 @@ class SessionController:
             # If a session is present in both lists, it might be updated
             if new_session.sessionUid in old_sessions_map:
                 # Check if there are differences between the old session and the new one
-                new_session.level = 500
                 session_field_diff = self.get_session_diff(
                     session_a=old_sessions_map[new_session.sessionUid],
                     session_b=new_session,
@@ -138,9 +137,13 @@ class SessionController:
                         new_session=new_session,
                         changed_fields=session_field_diff,
                     )
-                    print(f"Session {new_session.sessionUid} is updated")
+                    print(
+                        f"Session {new_session.sessionUid} ({new_session.thirdPartyID}) is updated"
+                    )
                 else:
-                    print(f"Session {new_session.sessionUid} is not updated")
+                    print(
+                        f"Session {new_session.sessionUid} ({new_session.thirdPartyID}) is not updated"
+                    )
 
         return ReInventSessionListDiff(
             added_sessions=added_sessions,

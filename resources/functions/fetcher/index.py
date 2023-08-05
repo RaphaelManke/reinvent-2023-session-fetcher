@@ -33,8 +33,9 @@ def handler(_event: Dict[str, Any], _context: LambdaContext) -> None:
     raw_sessions = fetch_sessions(username=USERNAME, password=PASSWORD)
 
     session_models_from_api: List[ReInventSession] = [
-        ReInventSession(**raw_session) for raw_session in raw_sessions[:2]
+        ReInventSession(**raw_session) for raw_session in raw_sessions[2:3]
     ]
+    print(session_models_from_api)
 
     if not session_models_from_api:
         raise RuntimeError("No sessions found, bailing.")
