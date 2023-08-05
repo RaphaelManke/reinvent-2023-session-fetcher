@@ -1,6 +1,9 @@
+from decimal import Decimal
 from typing import List, Optional, Dict
 import boto3
-import jsondiff
+import json
+import re
+from deepdiff import DeepDiff
 from boto3.dynamodb.types import TypeDeserializer
 
 from models import (
@@ -9,6 +12,13 @@ from models import (
     ReInventSessionDiff,
     ReInventSessionFieldDiff,
 )
+
+
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, Decimal):
+            return str(o)  # Convert Decimal to string representation
+        return super(DecimalEncoder, self).default(o)
 
 
 class SessionController:
@@ -138,13 +148,39 @@ class SessionController:
             updated_sessions=updated_sessions,
         )
 
-    @staticmethod
     def get_session_diff(
-        session_a: ReInventSession, session_b: ReInventSession
+        self, session_a: ReInventSession, session_b: ReInventSession
     ) -> List[ReInventSessionFieldDiff]:
-        diff = jsondiff.diff(session_a.model_dump(), session_b.model_dump())
-        print(diff)
-        return []
+        session_a_dump = session_a.model_dump()
+        session_b_dump = session_b.model_dump()
+
+        diff = DeepDiff(
+            session_a_dump,
+            session_b_dump,
+            ignore_order=True,
+            verbose_level=1,
+        )
+        if not diff:
+            return []
+
+        changes = []
+        for key in diff.keys():
+            key_regex = r"root\[\'(.*?)\'\].*"
+            match = re.match(key_regex, key)
+
+            for diff_type in diff[key]:
+                match = re.match(key_regex, diff_type)
+                if match:
+                    changed_key = match[1]
+                    changes.append(
+                        ReInventSessionFieldDiff(
+                            field=changed_key,
+                            old_value=session_a_dump.get(changed_key),
+                            new_value=session_b_dump.get(changed_key),
+                        )
+                    )
+
+        return changes
 
     @staticmethod
     def get_session_from_list_by_id(
