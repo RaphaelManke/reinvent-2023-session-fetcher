@@ -8,8 +8,6 @@ import requests
 
 COGNITO_CLIENT_ID = "4mbpjh0cd78jbbu5kc5i9717v"
 USER_POOL_ID = "us-east-1_iu3YTdfT3"
-USERNAME = "REDACTED"
-PASSWORD = "REDACTED"
 
 ROOT_DOMAIN = "https://hub.reinvent.awsevents.com"
 ATTENDEE_PORTAL_URL = f"{ROOT_DOMAIN}/attendee-portal/"
@@ -145,13 +143,13 @@ def redact(string: str) -> str:
         return string
 
 
-def get_tokens() -> Tuple[str, str, str]:
+def get_tokens(username: str, password: str) -> Tuple[str, str, str]:
     print(f"Getting cognito tokens")
 
     # Get tokens
     aws = AWSSRP(
-        username=USERNAME,
-        password=PASSWORD,
+        username=username,
+        password=password,
         pool_id=USER_POOL_ID,
         client_id=COGNITO_CLIENT_ID,
         pool_region="us-east-1",
@@ -231,14 +229,14 @@ def get_cookies(
     return response.cookies
 
 
-def fetch_sessions():
+def fetch_sessions(username: str, password: str):
     session = requests.Session()
     attendee_portal_redirect_location = call_attendee_portal_url(session)
     login_redirect_location = call_login_url(session, attendee_portal_redirect_location)
     authorization_code, state_code = call_authorize_url(
         session, login_redirect_location
     )
-    access_token, refresh_token, id_token = get_tokens()
+    access_token, refresh_token, id_token = get_tokens(username, password)
     perform_storage_call(
         session, authorization_code, access_token, refresh_token, id_token
     )
