@@ -80,6 +80,16 @@ class SessionController:
                     f"Item with PK: ReInventSession and SK: {session.sessionUid} already exists."
                 )
 
+    def update_sessions(self, updated_session_list: List[ReInventSession]):
+        """Update sessions in the database"""
+        for session in updated_session_list:
+            item_data = {
+                "PK": "ReInventSession",
+                "SK": session.sessionUid,
+            } | session.model_dump()
+
+            self._table.put_item(Item=item_data)
+
     def remove_sessions(self, session_list: List[ReInventSession]):
         """Insert new sessions into the database"""
         # Use the DDB batch write API to insert new sessions

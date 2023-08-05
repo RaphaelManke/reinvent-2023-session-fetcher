@@ -35,7 +35,6 @@ def handler(_event: Dict[str, Any], _context: LambdaContext) -> None:
     session_models_from_api: List[ReInventSession] = [
         ReInventSession(**raw_session) for raw_session in raw_sessions[2:3]
     ]
-    print(session_models_from_api)
 
     if not session_models_from_api:
         raise RuntimeError("No sessions found, bailing.")
@@ -46,6 +45,11 @@ def handler(_event: Dict[str, Any], _context: LambdaContext) -> None:
         new_session_list=diff.added_sessions.values()
     )
     session_controller.remove_sessions(session_list=diff.removed_sessions.values())
+    session_controller.update_sessions(
+        updated_session_list=[
+            session_diff.new_session for session_diff in diff.updated_sessions.values()
+        ]
+    )
 
 
 if __name__ == "__main__":
