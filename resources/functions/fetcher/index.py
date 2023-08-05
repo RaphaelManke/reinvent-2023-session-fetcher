@@ -30,17 +30,24 @@ USERNAME, PASSWORD = load_credentials()
 
 
 def handler(_event: Dict[str, Any], _context: LambdaContext) -> None:
+    # Fetch sessions from the API
     raw_sessions = fetch_sessions(username=USERNAME, password=PASSWORD)
-
     session_models_from_api: List[ReInventSession] = [
-        ReInventSession(**raw_session) for raw_session in raw_sessions[2:3]
+        ReInventSession(**raw_session) for raw_session in raw_sessions[:3]
     ]
 
+    # If no sessions are found, bail. This is defensive, to avoid purging
+    # the table in case of a bug.
     if not session_models_from_api:
         raise RuntimeError("No sessions found, bailing.")
 
+    # Create a SessionController instance
     session_controller = SessionController(db_table_name=DB_TABLE_NAME)
+
+    # Generate the diff between the sessions in the databaseand the sessions from the API
     diff = session_controller.generate_diff(new_session_list=session_models_from_api)
+
+    # Insert, update and remove the sessions in the database
     session_controller.insert_new_sessions(
         new_session_list=diff.added_sessions.values()
     )
@@ -50,6 +57,8 @@ def handler(_event: Dict[str, Any], _context: LambdaContext) -> None:
             session_diff.new_session for session_diff in diff.updated_sessions.values()
         ]
     )
+
+    ## ??? Profit
 
 
 if __name__ == "__main__":

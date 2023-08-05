@@ -108,6 +108,7 @@ class SessionController:
         added_sessions: Dict[str, ReInventSession] = {}
         removed_sessions: Dict[str, ReInventSession] = {}
         updated_sessions: Dict[str, ReInventSessionDiff] = {}
+        not_updated_sessions: List[str] = []
 
         old_sessions_map = {session.sessionUid: session for session in self.sessions}
 
@@ -151,9 +152,9 @@ class SessionController:
                         f"Session {new_session.sessionUid} ({new_session.thirdPartyID}) is updated"
                     )
                 else:
-                    print(
-                        f"Session {new_session.sessionUid} ({new_session.thirdPartyID}) is not updated"
-                    )
+                    not_updated_sessions.append(new_session.sessionUid)
+
+        print(f"Found {len(not_updated_sessions)} sessions without changes")
 
         return ReInventSessionListDiff(
             added_sessions=added_sessions,
