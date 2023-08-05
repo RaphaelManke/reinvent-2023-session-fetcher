@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import List, Any, Dict
 from pydantic import BaseModel, Field
 
@@ -20,22 +21,22 @@ LEVEL_MAPPING = {
 
 # Define the Pydantic model
 class ReInventSessionTag(BaseModel):
-    schedule_tag_uid: str = Field(alias="scheduleTagUid")
-    tag_name: str = Field(alias="tagName")
-    parent_tag_name: str = Field(alias="parentTagName")
-    parent_tag_uid: str = Field(alias="parentTagUid")
+    scheduleTagUid: str
+    tagName: str
+    parentTagName: str
+    parentTagUid: str
 
 
 class ReInventSession(BaseModel):
-    session_type: str = Field(alias="sessionType")
-    session_id: str = Field(alias="thirdPartyID")
-    track_name: str = Field(alias="trackName")
-    schedule_track_uid: str = Field(alias="scheduleTrackUid")
-    description: str = Field(alias="description")
-    schedule_uid: str = Field(alias="scheduleUid")
-    session_uid: str = Field(alias="sessionUid")
-    title: str = Field(alias="title")
-    level: int = -1
+    sessionType: str
+    thirdPartyID: str
+    trackName: str
+    scheduleTrackUid: str
+    description: str
+    scheduleUid: str
+    sessionUid: str
+    title: str
+    level: Decimal = -1
     tags: List[ReInventSessionTag]
     topics: List[str] = []
     industries: List[str] = []
@@ -47,20 +48,20 @@ class ReInventSession(BaseModel):
         super().__init__(*args, **kwargs)
 
         for tag in self.tags:
-            if tag.schedule_tag_uid in LEVEL_MAPPING:
-                self.level = LEVEL_MAPPING[tag.schedule_tag_uid]
-            if tag.parent_tag_uid == PARENT_TAG_UIDS["TOPIC"]:
-                self.topics.append(tag.tag_name.strip())
-            if tag.parent_tag_uid == PARENT_TAG_UIDS["INDUSTRY"]:
-                self.industries.append(tag.tag_name.strip())
-            if tag.parent_tag_uid == PARENT_TAG_UIDS["ROLE"]:
-                self.roles.append(tag.tag_name.strip())
-            if tag.parent_tag_uid == PARENT_TAG_UIDS["AREA_OF_INTEREST"]:
-                self.areas_of_interest.append(tag.tag_name.strip())
-            if tag.parent_tag_uid == PARENT_TAG_UIDS["SERVICES"]:
-                self.services.append(tag.tag_name.strip())
-            if tag.parent_tag_uid not in PARENT_TAG_UIDS.values():
-                print(f"Did not find Parent tag UID for '{tag.parent_tag_name}'")
+            if tag.scheduleTagUid in LEVEL_MAPPING:
+                self.level = LEVEL_MAPPING[tag.scheduleTagUid]
+            if tag.parentTagUid == PARENT_TAG_UIDS["TOPIC"]:
+                self.topics.append(tag.tagName.strip())
+            if tag.parentTagUid == PARENT_TAG_UIDS["INDUSTRY"]:
+                self.industries.append(tag.tagName.strip())
+            if tag.parentTagUid == PARENT_TAG_UIDS["ROLE"]:
+                self.roles.append(tag.tagName.strip())
+            if tag.parentTagUid == PARENT_TAG_UIDS["AREA_OF_INTEREST"]:
+                self.areas_of_interest.append(tag.tagName.strip())
+            if tag.parentTagUid == PARENT_TAG_UIDS["SERVICES"]:
+                self.services.append(tag.tagName.strip())
+            if tag.parentTagUid not in PARENT_TAG_UIDS.values():
+                print(f"Did not find Parent tag UID for '{tag.parentTagName}'")
 
 
 class ReInventSessionFieldDiff(BaseModel):

@@ -36,6 +36,9 @@ def handler(_event: Dict[str, Any], _context: LambdaContext) -> None:
         ReInventSession(**raw_session) for raw_session in raw_sessions[:2]
     ]
 
+    if not session_models_from_api:
+        raise RuntimeError("No sessions found, bailing.")
+
     session_controller = SessionController(db_table_name=DB_TABLE_NAME)
     diff = session_controller.generate_diff(new_session_list=session_models_from_api)
     session_controller.insert_new_sessions(
