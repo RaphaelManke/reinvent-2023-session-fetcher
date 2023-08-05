@@ -2,6 +2,7 @@ from aws_cdk import (
     Duration,
     aws_lambda as lambda_,
     aws_secretsmanager as secretsmanager,
+    aws_dynamodb as dynamodb,
 )
 from constructs import Construct
 
@@ -11,6 +12,7 @@ class Fetcher(Construct):
         self,
         scope: Construct,
         id: str,
+        db_table: dynamodb.Table,
         credential_secret: secretsmanager.Secret,
         **kwargs
     ):
@@ -31,6 +33,7 @@ class Fetcher(Construct):
             architecture=lambda_.Architecture.X86_64,
             layers=[layer],
             environment={
+                "DB_TABLE_NAME": db_table.table_name,
                 "POWERTOOLS_SERVICE_NAME": "reinvent2023_session_fetcher",
                 "LOG_LEVEL": "INFO",
                 "CREDENTIAL_SECRET_NAME": credential_secret.secret_name,

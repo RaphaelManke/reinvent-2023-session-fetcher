@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any, Dict
 from pydantic import BaseModel, Field
 
 PARENT_TAG_UIDS = {
@@ -61,3 +61,21 @@ class ReInventSession(BaseModel):
                 self.services.append(tag.tag_name.strip())
             if tag.parent_tag_uid not in PARENT_TAG_UIDS.values():
                 print(f"Did not find Parent tag UID for '{tag.parent_tag_name}'")
+
+
+class ReInventSessionFieldDiff(BaseModel):
+    field: str
+    old_value: Any
+    new_value: Any
+
+
+class ReInventSessionDiff(BaseModel):
+    old_session: ReInventSession
+    new_session: ReInventSession
+    changed_fields: List[ReInventSessionFieldDiff]
+
+
+class ReInventSessionListDiff(BaseModel):
+    added_sessions: Dict[str, ReInventSession]
+    removed_sessions: Dict[str, ReInventSession]
+    updated_sessions: Dict[str, ReInventSessionDiff]
