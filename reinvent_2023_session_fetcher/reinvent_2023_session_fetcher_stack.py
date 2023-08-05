@@ -3,6 +3,8 @@ from constructs import Construct
 
 from reinvent_2023_session_fetcher.app_constructs.storage import Storage
 from reinvent_2023_session_fetcher.app_constructs.fetcher import Fetcher
+from reinvent_2023_session_fetcher.app_constructs.event_generator import EventGenerator
+from reinvent_2023_session_fetcher.app_constructs.messaging import Messaging
 
 
 class Reinvent2023SessionFetcherStack(Stack):
@@ -14,6 +16,23 @@ class Reinvent2023SessionFetcherStack(Stack):
             id="Storage",
         )
 
-        Fetcher(scope=self, id="Fetcher", credential_secret=storage.credentials_secret)
+        Fetcher(
+            scope=self,
+            id="Fetcher",
+            credential_secret=storage.credentials_secret,
+            ddb_table=storage.table,
+            common_layer=storage.common_layer,
+        )
 
-        # EventGenerator()
+        messaging = Messaging(
+            scope=self,
+            id="Messaging",
+        )
+
+        EventGenerator(
+            scope=self,
+            id="EventGenerator",
+            ddb_table=storage.table,
+            event_bus=messaging.event_bus,
+            common_layer=storage.common_layer,
+        )

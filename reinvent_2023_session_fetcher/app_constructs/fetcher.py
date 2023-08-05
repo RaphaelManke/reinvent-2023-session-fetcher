@@ -12,17 +12,12 @@ class Fetcher(Construct):
         self,
         scope: Construct,
         id: str,
-        db_table: dynamodb.Table,
+        ddb_table: dynamodb.Table,
         credential_secret: secretsmanager.Secret,
+        common_layer: lambda_.LayerVersion,
         **kwargs
     ):
         super().__init__(scope, id, **kwargs)
-
-        layer = lambda_.LayerVersion(
-            scope=self,
-            id="FetcherFunctionLayer",
-            code=lambda_.Code.from_asset("resources/layers/fetcher/python.zip"),
-        )
 
         function = lambda_.Function(
             scope=self,
@@ -31,9 +26,9 @@ class Fetcher(Construct):
             handler="index.handler",
             runtime=lambda_.Runtime.PYTHON_3_10,
             architecture=lambda_.Architecture.X86_64,
-            layers=[layer],
+            layers=[common_layer],
             environment={
-                "DB_TABLE_NAME": db_table.table_name,
+                "DDB_TABLE_NAME": ddb_table.table_name,
                 "POWERTOOLS_SERVICE_NAME": "reinvent2023_session_fetcher",
                 "LOG_LEVEL": "INFO",
                 "CREDENTIAL_SECRET_NAME": credential_secret.secret_name,
@@ -43,3 +38,4 @@ class Fetcher(Construct):
         )
 
         credential_secret.grant_read(function)
+        ddb_table.grant_read_write_data(function)

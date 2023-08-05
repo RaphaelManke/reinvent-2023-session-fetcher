@@ -9,7 +9,7 @@ from models import ReInventSession
 import boto3
 
 CREDENTIAL_SECRET_NAME = os.environ["CREDENTIAL_SECRET_NAME"]
-DB_TABLE_NAME = os.environ["DB_TABLE_NAME"]
+DDB_TABLE_NAME = os.environ["DDB_TABLE_NAME"]
 
 
 def load_credentials() -> Tuple[str, str]:
@@ -33,7 +33,7 @@ def handler(_event: Dict[str, Any], _context: LambdaContext) -> None:
     # Fetch sessions from the API
     raw_sessions = fetch_sessions(username=USERNAME, password=PASSWORD)
     session_models_from_api: List[ReInventSession] = [
-        ReInventSession(**raw_session) for raw_session in raw_sessions[:3]
+        ReInventSession(**raw_session) for raw_session in raw_sessions[2:3]
     ]
 
     # If no sessions are found, bail. This is defensive, to avoid purging
@@ -42,7 +42,7 @@ def handler(_event: Dict[str, Any], _context: LambdaContext) -> None:
         raise RuntimeError("No sessions found, bailing.")
 
     # Create a SessionController instance
-    session_controller = SessionController(db_table_name=DB_TABLE_NAME)
+    session_controller = SessionController(ddb_table_name=DDB_TABLE_NAME)
 
     # Generate the diff between the sessions in the databaseand the sessions from the API
     diff = session_controller.generate_diff(new_session_list=session_models_from_api)

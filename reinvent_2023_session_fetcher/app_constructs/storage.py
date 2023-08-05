@@ -1,5 +1,6 @@
 from aws_cdk import (
     aws_dynamodb as dynamodb,
+    aws_lambda as lambda_,
     aws_secretsmanager as secretsmanager,
 )
 from constructs import Construct
@@ -18,10 +19,17 @@ class Storage(Construct):
                 name="PK", type=dynamodb.AttributeType.STRING
             ),
             sort_key=dynamodb.Attribute(name="SK", type=dynamodb.AttributeType.STRING),
+            stream=dynamodb.StreamViewType.NEW_AND_OLD_IMAGES,
         )
 
         # Secret for the Reinvent website user credentials
         self.credentials_secret = secretsmanager.Secret(
             scope=self,
             id="ReInventCredentialsSecret",
+        )
+
+        self.common_layer = lambda_.LayerVersion(
+            scope=self,
+            id="CommonFunctionLayer",
+            code=lambda_.Code.from_asset("resources/layers/common/python.zip"),
         )

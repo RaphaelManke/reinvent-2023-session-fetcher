@@ -24,7 +24,7 @@ class TestSessionController:
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = []
 
-        controller = SessionController(db_table_name="ReInventSessions")
+        controller = SessionController(ddb_table_name="ReInventSessions")
 
         session_list = [
             ReInventSession(
@@ -65,7 +65,7 @@ class TestSessionController:
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = []
 
-        controller = SessionController(db_table_name="ReInventSessions")
+        controller = SessionController(ddb_table_name="ReInventSessions")
 
         session_list = [
             ReInventSession(
@@ -126,7 +126,7 @@ class TestSessionController:
             )
         ]
 
-        controller = SessionController(db_table_name="ReInventSessions")
+        controller = SessionController(ddb_table_name="ReInventSessions")
 
         # 2. ACT
         response = controller.get_session_by_id(session_id="test_session_id")
@@ -163,7 +163,7 @@ class TestSessionController:
             )
         ]
 
-        controller = SessionController(db_table_name="ReInventSessions")
+        controller = SessionController(ddb_table_name="ReInventSessions")
 
         # 2. ACT
         response = controller.get_session_by_id(
@@ -182,7 +182,7 @@ class TestSessionController:
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = []
 
-        controller = SessionController(db_table_name="ReInventSessions")
+        controller = SessionController(ddb_table_name="ReInventSessions")
 
         test_session = ReInventSession(
             sessionType="Breakout Session",
@@ -221,7 +221,7 @@ class TestSessionController:
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = []
 
-        controller = SessionController(db_table_name="ReInventSessions")
+        controller = SessionController(ddb_table_name="ReInventSessions")
 
         session_a = ReInventSession(
             sessionType="Breakout Session",
@@ -279,7 +279,7 @@ class TestSessionController:
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = []
 
-        controller = SessionController(db_table_name="ReInventSessions")
+        controller = SessionController(ddb_table_name="ReInventSessions")
 
         session_a = ReInventSession(
             sessionType="Breakout Session",
@@ -328,7 +328,7 @@ class TestSessionController:
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = []
 
-        controller = SessionController(db_table_name="ReInventSessions")
+        controller = SessionController(ddb_table_name="ReInventSessions")
 
         session_a = ReInventSession(
             sessionType="Breakout Session",
@@ -400,7 +400,7 @@ class TestSessionController:
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = []
 
-        controller = SessionController(db_table_name="ReInventSessions")
+        controller = SessionController(ddb_table_name="ReInventSessions")
 
         session_a = ReInventSession(
             sessionType="Breakout Session",
@@ -476,7 +476,7 @@ class TestSessionController:
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = []
 
-        controller = SessionController(db_table_name="ReInventSessions")
+        controller = SessionController(ddb_table_name="ReInventSessions")
 
         session_a = ReInventSession(
             sessionType="Breakout Session",
@@ -629,7 +629,7 @@ class TestSessionController:
             session_b,
         ]
 
-        controller = SessionController(db_table_name="ReInventSessions")
+        controller = SessionController(ddb_table_name="ReInventSessions")
 
         # 2. ACT
         response = controller.generate_diff(
@@ -848,7 +848,7 @@ class TestSessionController:
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = [session_a]
 
-        controller = SessionController(db_table_name="ReInventSessions")
+        controller = SessionController(ddb_table_name="ReInventSessions")
 
         # 2. ACT
         response = controller.generate_diff(new_session_list=[session_a, session_b])
@@ -964,7 +964,7 @@ class TestSessionController:
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = [session_a, session_b]
 
-        controller = SessionController(db_table_name="ReInventSessions")
+        controller = SessionController(ddb_table_name="ReInventSessions")
 
         # 2. ACT
         response = controller.generate_diff(new_session_list=[session_a])
@@ -1087,7 +1087,7 @@ class TestSessionController:
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = [session_a_1]
 
-        controller = SessionController(db_table_name="ReInventSessions")
+        controller = SessionController(ddb_table_name="ReInventSessions")
 
         # 2. ACT
         response = controller.generate_diff(new_session_list=[session_a_2])
@@ -1251,7 +1251,7 @@ class TestSessionController:
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = [session_a_1]
 
-        controller = SessionController(db_table_name="ReInventSessions")
+        controller = SessionController(ddb_table_name="ReInventSessions")
 
         # 2. ACT
         response = controller.generate_diff(new_session_list=[session_a_2])

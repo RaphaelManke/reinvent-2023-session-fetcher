@@ -22,20 +22,20 @@ class DecimalEncoder(json.JSONEncoder):
 
 
 class SessionController:
-    def __init__(self, db_table_name: str):
-        self._db_table_name = db_table_name
+    def __init__(self, ddb_table_name: str):
+        self._ddb_table_name = ddb_table_name
         self._ddb_client = boto3.client("dynamodb")
         self._ddb_resource = boto3.resource("dynamodb")
         self._deserializer = TypeDeserializer()
 
-        self._table = self._ddb_resource.Table(self._db_table_name)
+        self._table = self._ddb_resource.Table(self._ddb_table_name)
         self.sessions = self._init_from_db()
 
     def _init_from_db(self) -> List[ReInventSession]:
         """Load all sessions from the database"""
         paginator = self._ddb_client.get_paginator("query")
         response_iterator = paginator.paginate(
-            TableName=self._db_table_name,
+            TableName=self._ddb_table_name,
             KeyConditionExpression=f"#pk = :val",
             ExpressionAttributeNames={"#pk": "PK"},
             ExpressionAttributeValues={":val": {"S": "ReInventSession"}},
@@ -62,7 +62,7 @@ class SessionController:
         for session in new_session_list:
             item_data = {
                 "PK": "ReInventSession",
-                "SK": session.sessionUid,
+                "SK": session.thirdPartyID,
             } | session.model_dump()
 
             # Add a condition expression to prevent overwriting existing items
@@ -85,7 +85,7 @@ class SessionController:
         for session in updated_session_list:
             item_data = {
                 "PK": "ReInventSession",
-                "SK": session.sessionUid,
+                "SK": session.thirdPartyID,
             } | session.model_dump()
 
             self._table.put_item(Item=item_data)
@@ -97,7 +97,7 @@ class SessionController:
             self._table.delete_item(
                 Key={
                     "PK": "ReInventSession",
-                    "SK": session.sessionUid,
+                    "SK": session.thirdPartyID,
                 }
             )
 
@@ -172,7 +172,6 @@ class SessionController:
             session_a_dump,
             session_b_dump,
             ignore_order=True,
-            verbose_level=1,
         )
         if not diff:
             return []
