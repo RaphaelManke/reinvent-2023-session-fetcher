@@ -1,6 +1,5 @@
 from aws_cdk import (
     Duration,
-    aws_iam as iam,
     aws_events as events,
     aws_lambda as lambda_,
     aws_dynamodb as dynamodb,
@@ -38,6 +37,11 @@ class EventGenerator(Construct):
             id="DynamoDBMapping",
             event_source_arn=ddb_table.table_stream_arn,
             starting_position=lambda_.StartingPosition.LATEST,
+            filters=[  # Only trigger on changes to 'ReInventSession' items
+                lambda_.FilterCriteria.filter(
+                    {"dynamodb": {"Keys": {"PK": {"S": ["ReInventSession"]}}}}
+                )
+            ],
         )
 
         event_bus.grant_all_put_events(function)

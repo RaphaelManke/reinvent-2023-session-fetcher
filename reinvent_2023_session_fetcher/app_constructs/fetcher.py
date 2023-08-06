@@ -34,7 +34,7 @@ class Fetcher(Construct):
                 "CREDENTIAL_SECRET_NAME": credential_secret.secret_name,
             },
             memory_size=1024,
-            timeout=Duration.seconds(30),
+            timeout=Duration.seconds(300),
         )
 
         credential_secret.grant_read(function)

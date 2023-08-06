@@ -1,3 +1,4 @@
+![Architecture](docs_assets/architecture.png)
 
 # Welcome to your CDK Python project!
 
