@@ -1,4 +1,5 @@
 from aws_cdk import (
+    RemovalPolicy,
     aws_dynamodb as dynamodb,
     aws_lambda as lambda_,
     aws_secretsmanager as secretsmanager,
@@ -20,16 +21,19 @@ class Storage(Construct):
             ),
             sort_key=dynamodb.Attribute(name="SK", type=dynamodb.AttributeType.STRING),
             stream=dynamodb.StreamViewType.NEW_AND_OLD_IMAGES,
+            removal_policy=RemovalPolicy.DESTROY,
         )
 
         # Secret for the Reinvent website user credentials
         self.credentials_secret = secretsmanager.Secret(
             scope=self,
             id="ReInventCredentialsSecret",
+            removal_policy=RemovalPolicy.DESTROY,
         )
 
         self.common_layer = lambda_.LayerVersion(
             scope=self,
             id="CommonFunctionLayer",
             code=lambda_.Code.from_asset("resources/layers/common/python.zip"),
+            removal_policy=RemovalPolicy.DESTROY,
         )
