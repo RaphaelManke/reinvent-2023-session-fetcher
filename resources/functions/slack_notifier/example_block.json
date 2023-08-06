@@ -1,0 +1,48 @@
+{
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "New Session:\n Using generative AI to add objects in model training scenarios in ADDF",
+				"emoji": true
+			}
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*trackName* - Builders' Session"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*thirdPartyID* - AUT303"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*sessionType* - standard"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*trackName* - Builders' Session"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*level* - 300"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*services* - Amazon Elastic Compute Cloud (EC2), AWS Backup, Amazon WorkSpaces, Amazon WorkSpaces, Amazon WorkSpaces, Amazon WorkSpaces, Amazon WorkSpaces"
+				}
+			]
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "*desription*\nThis is a mrkdwn section block :ghost: *this is bold*, and ~this is crossed out~, and <https://google.com|this is a link>"
+			}
+		}
+	]
+}

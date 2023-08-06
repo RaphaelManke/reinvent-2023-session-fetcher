@@ -1,5 +1,6 @@
 from aws_cdk import Stack
 from constructs import Construct
+from reinvent_2023_session_fetcher.app_constructs.slack_notifier import SlackNotifier
 
 from reinvent_2023_session_fetcher.app_constructs.storage import Storage
 from reinvent_2023_session_fetcher.app_constructs.fetcher import Fetcher
@@ -33,6 +34,13 @@ class Reinvent2023SessionFetcherStack(Stack):
             scope=self,
             id="EventGenerator",
             ddb_table=storage.table,
+            event_bus=messaging.event_bus,
+            common_layer=storage.common_layer,
+        )
+
+        SlackNotifier(
+            scope=self,
+            id="SlackNotifier",
             event_bus=messaging.event_bus,
             common_layer=storage.common_layer,
         )
