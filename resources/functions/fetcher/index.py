@@ -33,7 +33,7 @@ def handler(_event: Dict[str, Any], _context: LambdaContext) -> None:
     # Fetch sessions from the API
     raw_sessions = fetch_sessions(username=USERNAME, password=PASSWORD)
     session_models_from_api: List[ReInventSession] = [
-        ReInventSession(**raw_session) for raw_session in raw_sessions[2:3]
+        ReInventSession(**raw_session) for raw_session in raw_sessions
     ]
 
     # If no sessions are found, bail. This is defensive, to avoid purging
