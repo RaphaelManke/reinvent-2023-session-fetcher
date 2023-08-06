@@ -19,7 +19,7 @@ class Fetcher(Construct):
     ):
         super().__init__(scope, id, **kwargs)
 
-        function = lambda_.Function(
+        self.function = lambda_.Function(
             scope=self,
             id="FetcherFunction",
             code=lambda_.Code.from_asset("resources/functions/fetcher"),
@@ -37,5 +37,5 @@ class Fetcher(Construct):
             timeout=Duration.seconds(30),
         )
 
-        credential_secret.grant_read(function)
-        ddb_table.grant_read_write_data(function)
+        credential_secret.grant_read(self.function)
+        ddb_table.grant_read_write_data(self.function)

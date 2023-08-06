@@ -1,5 +1,6 @@
 from aws_cdk import Stack
 from constructs import Construct
+from reinvent_2023_session_fetcher.app_constructs.fetcher_trigger import FetcherTrigger
 from reinvent_2023_session_fetcher.app_constructs.slack_notifier import SlackNotifier
 
 from reinvent_2023_session_fetcher.app_constructs.storage import Storage
@@ -23,6 +24,11 @@ class Reinvent2023SessionFetcherStack(Stack):
             credential_secret=storage.credentials_secret,
             ddb_table=storage.table,
             common_layer=storage.common_layer,
+        )
+        FetcherTrigger(
+            scope=self,
+            id="FetcherTrigger",
+            fetcher_lambda=fetcher.function,
         )
 
         messaging = Messaging(
