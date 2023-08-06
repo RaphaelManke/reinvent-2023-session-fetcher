@@ -1,15 +1,22 @@
 #!/usr/bin/env python3
+import os
 import aws_cdk as cdk
+from dotenv import load_dotenv
 
 from reinvent_2023_session_fetcher.reinvent_2023_session_fetcher_stack import (
     Reinvent2023SessionFetcherStack,
 )
+
+load_dotenv()
 
 
 app = cdk.App()
 Reinvent2023SessionFetcherStack(
     app,
     "Reinvent2023SessionFetcherStack",
+    slack_channel_id=os.getenv("SLACK_CHANNEL_ID"),
+    slack_channel_configuration_name=os.getenv("SLACK_CHANNEL_CONFIGURATION_NAME"),
+    slack_workspace_id=os.getenv("SLACK_WORKSPACE_ID"),
     # If you don't specify 'env', this stack will be environment-agnostic.
     # Account/Region-dependent features and context lookups will not work,
     # but a single synthesized template can be deployed anywhere.

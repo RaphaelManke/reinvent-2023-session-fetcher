@@ -48,7 +48,7 @@ class SlackNotifier(Construct):
             targets=[events_targets.SqsQueue(queue=queue)],
         )
 
-        function = lambda_.Function(
+        self.function = lambda_.Function(
             scope=self,
             id="SlackNotifierFunction",
             code=lambda_.Code.from_asset("resources/functions/slack_notifier"),
@@ -65,7 +65,7 @@ class SlackNotifier(Construct):
             timeout=Duration.seconds(30),
         )
 
-        function.add_event_source(
+        self.function.add_event_source(
             source=lambda_event_sources.SqsEventSource(queue=queue, batch_size=1)
         )
-        slack_webhook_url_secret.grant_read(function)
+        slack_webhook_url_secret.grant_read(self.function)
