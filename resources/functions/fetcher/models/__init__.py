@@ -1,5 +1,5 @@
 from decimal import Decimal
-from typing import List, Any, Dict
+from typing import List, Any, Dict, Optional
 from pydantic import BaseModel, Field
 
 PARENT_TAG_UIDS = {
@@ -43,6 +43,31 @@ class ReInventSession(BaseModel):
     roles: List[str] = []
     areas_of_interest: List[str] = []
     services: List[str] = []
+    # Optional fields
+    venueUid: Optional[str] = None
+    startDateTime: Optional[str] = None
+    sessionCap: Optional[str] = None
+    floorplanName: Optional[str] = None
+    embargoManualEnabled: Optional[int] = None
+    showAddToAgendaButton: Optional[int] = None
+    locationName: Optional[str] = None
+    locationUid: Optional[str] = None
+    venueName: Optional[str] = None
+    embargoDate: Optional[str] = None
+    inviteStatus: Optional[str] = None
+    hideOnAgenda: Optional[int] = None
+    speakers: Optional[List[Any]] = []
+    trackPersonalAgenda: Optional[int] = None
+    enableWaitlist: Optional[int] = None
+    hideTime: Optional[int] = None
+    enableInviteOnly: Optional[int] = None
+    embargoOption: Optional[int] = None
+    PersonalAgendaSessionAttendeeTypes: Optional[str] = None
+    sponsors: Optional[List[Any]] = []
+    blockedAttendeeTypes: Optional[str] = None
+    contentStatusID: Optional[int] = None
+    endDateTime: Optional[str] = None
+    trackHideOnAgenda: Optional[int] = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
