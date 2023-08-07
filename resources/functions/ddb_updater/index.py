@@ -30,7 +30,6 @@ def handler(event: Dict[str, Any], _context: LambdaContext) -> None:
 
 
 def _write_mutation_to_ddb(event_type: EventType, source_event: dict):
-    print(event_type.value)
     session_id = None
     match event_type.value:
         case "SessionRemoved":
@@ -40,13 +39,28 @@ def _write_mutation_to_ddb(event_type: EventType, source_event: dict):
         case "SessionUpdated":
             session_id = source_event["data"]["new"]["thirdPartyID"]
 
-    item_data = {
-        "PK": "SessionMutation",
-        "SK": source_event["metadata"]["eventDateTime"],
-    } | {
-        "mutationType": event_type.value,
-        "sessionID": session_id,
-        "mutationData": source_event["data"],
-    }
+    # SessionMutation, used to list all mutations
+    TABLE.put_item(
+        Item={
+            "PK": "SessionMutation",
+            "SK": source_event["metadata"]["eventDateTime"],
+        }
+        | {
+            "mutationType": event_type.value,
+            "sessionID": session_id,
+            "mutationData": source_event["data"],
+        }
+    )
 
-    TABLE.put_item(Item=item_data)
+    # {sessionID}#SessionMutation, used to list all mutations for a given session ID
+    TABLE.put_item(
+        Item={
+            "PK": f"{session_id}#SessionMutation",
+            "SK": source_event["metadata"]["eventDateTime"],
+        }
+        | {
+            "mutationType": event_type.value,
+            "sessionID": session_id,
+            "mutationData": source_event["data"],
+        }
+    )
