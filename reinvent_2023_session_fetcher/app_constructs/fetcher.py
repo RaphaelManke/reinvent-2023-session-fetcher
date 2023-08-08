@@ -1,8 +1,10 @@
 from aws_cdk import (
     Duration,
     aws_lambda as lambda_,
+    aws_iam as iam,
     aws_secretsmanager as secretsmanager,
     aws_dynamodb as dynamodb,
+    aws_scheduler as scheduler,
 )
 from constructs import Construct
 
@@ -19,6 +21,7 @@ class Fetcher(Construct):
     ):
         super().__init__(scope, id, **kwargs)
 
+        # Create a function to fetch sessions from the Re:Invent portal
         self.function = lambda_.Function(
             scope=self,
             id="FetcherFunction",
@@ -37,5 +40,39 @@ class Fetcher(Construct):
             timeout=Duration.seconds(300),
         )
 
+        # Give it the correct permissions
         credential_secret.grant_read(self.function)
         ddb_table.grant_read_write_data(self.function)
+
+        # Create a schedule to invoke the function every minute
+        scheduler_role = iam.Role(
+            scope=self,
+            id="FetcherSchedulerRole",
+            assumed_by=iam.ServicePrincipal("scheduler.amazonaws.com"),
+            inline_policies={
+                "invoke_lambda": iam.PolicyDocument.from_json(
+                    {
+                        "Version": "2012-10-17",
+                        "Statement": [
+                            {
+                                "Action": ["lambda:InvokeFunction"],
+                                "Effect": "Allow",
+                                "Resource": function.function_arn,
+                            }
+                        ],
+                    }
+                )
+            },
+        )
+
+        scheduler.CfnSchedule(
+            scope=self,
+            id="FetcherSchedule",
+            schedule_expression="rate(1 minute)",
+            target=scheduler.CfnSchedule.TargetProperty(
+                arn=self.function.function_arn, role_arn=scheduler_role.role_arn
+            ),
+            flexible_time_window=scheduler.CfnSchedule.FlexibleTimeWindowProperty(
+                mode="OFF"
+            ),
+        )
