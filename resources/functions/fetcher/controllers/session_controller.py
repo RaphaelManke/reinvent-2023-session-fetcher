@@ -45,7 +45,7 @@ class SessionController:
         # Iterate through the paginated results
         for page in response_iterator:
             items = page["Items"]
-            # Do something with the items returned (e.g., print them)
+            # Convert all JSON items to ReInventSession models
             for item in items:
                 deserialized_item = {
                     key: self._deserializer.deserialize(value)
