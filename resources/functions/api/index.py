@@ -46,12 +46,12 @@ def get_sessions() -> Response:
     sorted_data = _sort_list_by_nested_key(
         source_list=payload, nested_key="SK", reverse=False
     )
-    cleaned_data = _purge_ddb_pk_and_sk(sorted_data)
+    _purge_ddb_pk_and_sk(sorted_data)
 
     return Response(
         status_code=HTTPStatus.OK,
         content_type=content_types.APPLICATION_JSON,
-        body=json.dumps(cleaned_data, cls=DecimalEncoder),
+        body=json.dumps(sorted_data, cls=DecimalEncoder),
         compress=True,
     )
 
@@ -60,12 +60,12 @@ def get_sessions() -> Response:
 def get_session(session_id: str) -> Response:
     try:
         payload = _get_session(session_id)
-        cleaned_data = _purge_ddb_pk_and_sk(payload)
+        _purge_ddb_pk_and_sk(payload)
 
         return Response(
             status_code=HTTPStatus.OK,
             content_type=content_types.APPLICATION_JSON,
-            body=json.dumps(cleaned_data, cls=DecimalEncoder),
+            body=json.dumps(payload, cls=DecimalEncoder),
             compress=True,
         )
     except Exception as exc:
@@ -81,12 +81,15 @@ def get_session(session_id: str) -> Response:
 @app.get("/sessions/<session_id>/history")
 def get_session_history(session_id) -> Response:
     payload = _get_session_history(session_id)
-    cleaned = _sort_and_clean_mutations(payload)
+    cleaned_mutations = _sort_and_clean_mutations(payload)
+    for mutation in cleaned_mutations:
+        _purge_ddb_pk_and_sk(mutation)
+        _purge_ddb_pk_and_sk(mutation["mutationData"])
 
     return Response(
         status_code=HTTPStatus.OK,
         content_type=content_types.APPLICATION_JSON,
-        body=json.dumps(cleaned, cls=DecimalEncoder),
+        body=json.dumps(cleaned_mutations, cls=DecimalEncoder),
         compress=True,
     )
 
@@ -95,17 +98,14 @@ def get_session_history(session_id) -> Response:
 def get_mutations() -> Response:
     payload = _get_all_mutations()
     cleaned_mutations = _sort_and_clean_mutations(payload)
+
     for mutation in cleaned_mutations:
-        mutation["mutationData"] = _purge_ddb_pk_and_sk(mutation["mutationData"])
+        _purge_ddb_pk_and_sk(mutation)
 
         try:
-            mutation["mutationData"]["new"] = _purge_ddb_pk_and_sk(
-                mutation["mutationData"]["new"]
-            )
-            mutation["mutationData"]["old"] = _purge_ddb_pk_and_sk(
-                mutation["mutationData"]["old"]
-            )
-        except KeyError:
+            _purge_ddb_pk_and_sk(mutation["mutationData"]["new"])
+            _purge_ddb_pk_and_sk(mutation["mutationData"]["old"])
+        except:
             # Okay if the 'new' or 'old' keys are not found, they're only present for mutations.
             pass
 
@@ -131,18 +131,15 @@ def _sort_and_clean_mutations(mutations: List) -> List:
     return sorted_data
 
 
-def _purge_ddb_pk_and_sk(data: Union[List, Dict]) -> Union[List, Dict]:
+def _purge_ddb_pk_and_sk(data: Union[List, Dict]) -> None:
     """Remove keys from the response that are not needed"""
-    data_copy = deepcopy(data)
-    if isinstance(data_copy, list):
-        for item in data_copy:
+    if isinstance(data, list):
+        for item in data:
             item.pop("PK", None)
             item.pop("SK", None)
-    elif isinstance(data_copy, dict):
-        data_copy.pop("PK", None)
-        data_copy.pop("SK", None)
-
-    return data_copy
+    elif isinstance(data, dict):
+        data.pop("PK", None)
+        data.pop("SK", None)
 
 
 def _sort_list_by_nested_key(source_list, nested_key, reverse=False):
