@@ -1,5 +1,6 @@
+from aws_lambda_powertools import Logger
 from requests.sessions import RequestsCookieJar
-from srp.aws_srp import AWSSRP
+from src.srp.aws_srp import AWSSRP
 from typing import Dict, Tuple
 import json
 import re
@@ -19,8 +20,11 @@ STORAGE_URL = "https://28ym3tywek.execute-api.us-east-1.amazonaws.com/storage"
 REDACT_LOGS = True
 
 
+logger = Logger()
+
+
 def call_attendee_portal_url(session: requests.Session) -> str:
-    print(f"Calling Attendee Portal URL: {ATTENDEE_PORTAL_URL}")
+    logger.debug(f"Calling Attendee Portal URL: {ATTENDEE_PORTAL_URL}")
     response = session.get(
         ATTENDEE_PORTAL_URL,
         allow_redirects=False,
@@ -57,13 +61,13 @@ def call_attendee_portal_url(session: requests.Session) -> str:
     if redirect_location.startswith("/"):
         redirect_location = ROOT_DOMAIN + redirect_location
 
-    print(f" - Status code: {response.status_code}")
-    print(f" - Redirect location: {redact(redirect_location)}")
+    logger.debug(f" - Status code: {response.status_code}")
+    logger.debug(f" - Redirect location: {redact(redirect_location)}")
     return redirect_location
 
 
 def call_login_url(session: requests.Session, url) -> str:
-    print(f"Calling login URL: {redact(url)}")
+    logger.debug(f"Calling login URL: {redact(url)}")
     response = session.get(
         url,
         allow_redirects=False,
@@ -83,13 +87,13 @@ def call_login_url(session: requests.Session, url) -> str:
     if redirect_location.startswith("/"):
         redirect_location = ROOT_DOMAIN + redirect_location
 
-    print(f" - Status code: {response.status_code}")
-    print(f" - Redirect location: {redact(redirect_location)}")
+    logger.debug(f" - Status code: {response.status_code}")
+    logger.debug(f" - Redirect location: {redact(redirect_location)}")
     return redirect_location
 
 
 def call_authorize_url(session: requests.Session, url) -> Tuple[str, str]:
-    print(f"Calling Authorize URL: {redact(url)}")
+    logger.debug(f"Calling Authorize URL: {redact(url)}")
     response = session.get(
         url,
         allow_redirects=False,
@@ -109,8 +113,8 @@ def call_authorize_url(session: requests.Session, url) -> Tuple[str, str]:
     if redirect_location.startswith("/"):
         redirect_location = ROOT_DOMAIN + redirect_location
 
-    print(f" - Status code: {response.status_code}")
-    print(f" - Redirect location: {redact(redirect_location)}")
+    logger.debug(f" - Status code: {response.status_code}")
+    logger.debug(f" - Redirect location: {redact(redirect_location)}")
 
     redirect_uri_index = redirect_location.find("redirect_uri=") + len("redirect_uri=")
     redirect_uri = redirect_location[redirect_uri_index:]
@@ -124,8 +128,8 @@ def call_authorize_url(session: requests.Session, url) -> Tuple[str, str]:
         if token.startswith("state="):
             state_code = token[len("state=") :]
 
-    print(f" - authorization_code: {redact(authorization_code)}")
-    print(f" - state_code: {redact(state_code)}")
+    logger.debug(f" - authorization_code: {redact(authorization_code)}")
+    logger.debug(f" - state_code: {redact(state_code)}")
     return authorization_code, state_code
 
 
@@ -144,7 +148,7 @@ def redact(string: str) -> str:
 
 
 def get_tokens(username: str, password: str) -> Tuple[str, str, str]:
-    print(f"Getting cognito tokens")
+    logger.debug(f"Getting cognito tokens")
 
     # Get tokens
     aws = AWSSRP(
@@ -159,9 +163,9 @@ def get_tokens(username: str, password: str) -> Tuple[str, str, str]:
     access_token = tokens["AuthenticationResult"]["AccessToken"]
     refresh_token = tokens["AuthenticationResult"]["RefreshToken"]
     id_token = tokens["AuthenticationResult"]["IdToken"]
-    print(f" - access_token: {redact(access_token)}")
-    print(f" - refresh_token: {redact(refresh_token)}")
-    print(f" - id_token: {redact(id_token)}")
+    logger.debug(f" - access_token: {redact(access_token)}")
+    logger.debug(f" - refresh_token: {redact(refresh_token)}")
+    logger.debug(f" - id_token: {redact(id_token)}")
 
     return access_token, refresh_token, id_token
 
@@ -169,7 +173,7 @@ def get_tokens(username: str, password: str) -> Tuple[str, str, str]:
 def perform_storage_call(
     session: requests.Session, authorization_code, access_token, refresh_token, id_token
 ) -> None:
-    print(f"Calling Storage URL: {STORAGE_URL}")
+    logger.debug(f"Calling Storage URL: {STORAGE_URL}")
     response = session.post(
         url=STORAGE_URL,
         headers={
@@ -194,14 +198,14 @@ def perform_storage_call(
             }
         ),
     )
-    print(f" - Status code: {response.status_code}")
+    logger.debug(f" - Status code: {response.status_code}")
 
 
 def get_cookies(
     session: requests.Session, authorization_code, state_code
 ) -> RequestsCookieJar:
     cookies_url = GET_COOKIES_URL.format(code=authorization_code, state=state_code)
-    print(f"Cookies URL: {redact(cookies_url)}")
+    logger.debug(f"Cookies URL: {redact(cookies_url)}")
     response = session.get(
         cookies_url,
         allow_redirects=False,
@@ -224,7 +228,7 @@ def get_cookies(
             f"Response status code should be 302, but is {response.status_code}"
         )
 
-    print(f" - Status code: {response.status_code}")
+    logger.debug(f" - Status code: {response.status_code}")
 
     return response.cookies
 

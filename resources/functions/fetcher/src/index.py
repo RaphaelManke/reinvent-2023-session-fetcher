@@ -1,11 +1,13 @@
 import json
 import os
 from typing import Any, Dict, Tuple, List
-from aws_lambda_powertools.utilities.typing import LambdaContext
 
-from sessions_api import fetch_sessions
-from controllers.session_controller import SessionController
-from models import ReInventSession
+from src.sessions_api import fetch_sessions
+from src.controllers.session_controller import SessionController
+from src.models import ReInventSession
+
+from aws_lambda_powertools import Logger
+from aws_lambda_powertools.utilities.typing import LambdaContext
 import boto3
 
 CREDENTIAL_SECRET_NAME = os.environ["CREDENTIAL_SECRET_NAME"]
@@ -29,7 +31,12 @@ def load_credentials() -> Tuple[str, str]:
 USERNAME, PASSWORD = load_credentials()
 
 
+logger = Logger()
+
+
+@logger.inject_lambda_context
 def handler(_event: Dict[str, Any], _context: LambdaContext) -> None:
+    logger.info("Starting run")
     # Fetch sessions from the API
     raw_sessions = fetch_sessions(username=USERNAME, password=PASSWORD)
     session_models_from_api: List[ReInventSession] = [
@@ -57,9 +64,3 @@ def handler(_event: Dict[str, Any], _context: LambdaContext) -> None:
             session_diff.new_session for session_diff in diff.updated_sessions.values()
         ]
     )
-
-    ## ??? Profit
-
-
-if __name__ == "__main__":
-    handler({}, None)

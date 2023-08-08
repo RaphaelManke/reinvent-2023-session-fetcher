@@ -26,7 +26,7 @@ class Fetcher(Construct):
             scope=self,
             id="FetcherFunction",
             code=lambda_.Code.from_asset("resources/functions/fetcher"),
-            handler="index.handler",
+            handler="src.index.handler",
             runtime=lambda_.Runtime.PYTHON_3_10,
             architecture=lambda_.Architecture.X86_64,
             layers=[common_layer],
