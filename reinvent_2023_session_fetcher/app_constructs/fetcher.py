@@ -57,7 +57,7 @@ class Fetcher(Construct):
                             {
                                 "Action": ["lambda:InvokeFunction"],
                                 "Effect": "Allow",
-                                "Resource": function.function_arn,
+                                "Resource": self.function.function_arn,
                             }
                         ],
                     }
@@ -68,7 +68,7 @@ class Fetcher(Construct):
         scheduler.CfnSchedule(
             scope=self,
             id="FetcherSchedule",
-            schedule_expression="rate(1 minute)",
+            schedule_expression="rate(5 minute)",
             target=scheduler.CfnSchedule.TargetProperty(
                 arn=self.function.function_arn, role_arn=scheduler_role.role_arn
             ),

@@ -39,11 +39,11 @@ class Reinvent2023SessionFetcherStack(Stack):
             common_layer=storage.common_layer,
         )
 
-        FetcherTrigger(
-            scope=self,
-            id="FetcherTrigger",
-            fetcher_lambda=fetcher.function,
-        )
+        # FetcherTrigger(
+        #     scope=self,
+        #     id="FetcherTrigger",
+        #     fetcher_lambda=fetcher.function,
+        # )
 
         messaging = Messaging(
             scope=self,

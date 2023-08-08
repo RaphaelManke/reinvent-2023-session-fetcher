@@ -26,6 +26,11 @@ class RestApi(Construct):
             default_cors_preflight_options=apigateway.CorsOptions(
                 allow_origins=apigateway.Cors.ALL_ORIGINS
             ),
+            endpoint_types=[apigateway.EndpointType.REGIONAL],
+            deploy_options=apigateway.StageOptions(
+                caching_enabled=True,
+                cache_ttl=Duration.seconds(300),
+            ),
         )
 
         # Create a Lambda function to handle the /mutations resource
