@@ -1,22 +1,14 @@
 import os
 import json
-import sys
 
-from decimal import Decimal
 import freezegun
 import pytest
 from unittest import mock
 from unittest.mock import MagicMock
 
 
-class TestSessionController:
-    """Tests for the SessionController."""
-
-    @pytest.fixture(autouse=True)
-    def function_path(self):
-        sys.path.append("resources/functions/event_generator")
-        yield
-        sys.path.remove("resources/functions/event_generator")
+class TestEventGenerator:
+    """Tests for the EventGenerator."""
 
     @pytest.fixture(autouse=True)
     def env(self):
@@ -985,7 +977,7 @@ class TestSessionController:
     @freezegun.freeze_time("2023-01-14")
     def test_handle_ddb_insert_event(session_added_v1_event):
         # 1. ARRANGE
-        import index
+        from .. import index
 
         index._put_events = MagicMock()
 
@@ -1044,7 +1036,7 @@ class TestSessionController:
     @freezegun.freeze_time("2023-01-14")
     def test_handle_ddb_remove_event(session_removed_v1_event):
         # 1. ARRANGE
-        import index
+        from .. import index
 
         index._put_events = MagicMock()
 
@@ -1109,7 +1101,7 @@ class TestSessionController:
         session_updated_v1_event_list_element_add,
     ):
         # 1. ARRANGE
-        import index
+        from .. import index
 
         index._put_events = MagicMock()
 
@@ -1221,7 +1213,7 @@ class TestSessionController:
         session_updated_v1_event_list_element_remove,
     ):
         # 1. ARRANGE
-        import index
+        from .. import index
 
         index._put_events = MagicMock()
 
@@ -1328,7 +1320,7 @@ class TestSessionController:
         session_updated_v1_event_list_element_reorder,
     ):
         # 1. ARRANGE
-        import index
+        from .. import index
 
         index._put_events = MagicMock()
 
@@ -1427,7 +1419,7 @@ class TestSessionController:
         session_updated_v1_event_field_add,
     ):
         # 1. ARRANGE
-        import index
+        from .. import index
 
         index._put_events = MagicMock()
 
@@ -1531,7 +1523,7 @@ class TestSessionController:
         session_updated_v1_event_field_remove,
     ):
         # 1. ARRANGE
-        import index
+        from .. import index
 
         index._put_events = MagicMock()
 
@@ -1635,7 +1627,7 @@ class TestSessionController:
         session_updated_v1_event_deep_field_change,
     ):
         # 1. ARRANGE
-        import index
+        from .. import index
 
         index._put_events = MagicMock()
 
@@ -1749,7 +1741,7 @@ class TestSessionController:
         session_updated_v1_event_field_change,
     ):
         # 1. ARRANGE
-        import index
+        from .. import index
 
         index._put_events = MagicMock()
 

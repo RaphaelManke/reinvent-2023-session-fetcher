@@ -1,11 +1,12 @@
+from aws_lambda_powertools.utilities.typing import LambdaContext
+from boto3.dynamodb.types import TypeDeserializer
+from copy import deepcopy
 from decimal import Decimal
 from http import HTTPStatus
 from typing import List, Dict, Union
 import boto3
 import json
 import os
-from aws_lambda_powertools.utilities.typing import LambdaContext
-from boto3.dynamodb.types import TypeDeserializer
 
 from aws_lambda_powertools.event_handler import (
     APIGatewayRestResolver,
@@ -45,12 +46,12 @@ def get_sessions() -> Response:
     sorted_data = _sort_list_by_nested_key(
         source_list=payload, nested_key="SK", reverse=False
     )
-    _purge_keys_from_response(sorted_data)
+    cleaned_data = _purge_ddb_pk_and_sk(sorted_data)
 
     return Response(
         status_code=HTTPStatus.OK,
         content_type=content_types.APPLICATION_JSON,
-        body=json.dumps(sorted_data, cls=DecimalEncoder),
+        body=json.dumps(cleaned_data, cls=DecimalEncoder),
         compress=True,
     )
 
@@ -59,12 +60,12 @@ def get_sessions() -> Response:
 def get_session(session_id: str) -> Response:
     try:
         payload = _get_session(session_id)
-        _purge_keys_from_response(payload)
+        cleaned_data = _purge_ddb_pk_and_sk(payload)
 
         return Response(
             status_code=HTTPStatus.OK,
             content_type=content_types.APPLICATION_JSON,
-            body=json.dumps(payload, cls=DecimalEncoder),
+            body=json.dumps(cleaned_data, cls=DecimalEncoder),
             compress=True,
         )
     except Exception as exc:
@@ -78,19 +79,14 @@ def get_session(session_id: str) -> Response:
 
 
 @app.get("/sessions/<session_id>/history")
-def get_session(session_id) -> Response:
+def get_session_history(session_id) -> Response:
     payload = _get_session_history(session_id)
-
-    # Sort payload by mutation date, descending
-    sorted_data = _sort_list_by_nested_key(
-        source_list=payload, nested_key="SK", reverse=True
-    )
-    _purge_keys_from_response(sorted_data)
+    cleaned = _sort_and_clean_mutations(payload)
 
     return Response(
         status_code=HTTPStatus.OK,
         content_type=content_types.APPLICATION_JSON,
-        body=json.dumps(sorted_data, cls=DecimalEncoder),
+        body=json.dumps(cleaned, cls=DecimalEncoder),
         compress=True,
     )
 
@@ -98,30 +94,55 @@ def get_session(session_id) -> Response:
 @app.get("/mutations")
 def get_mutations() -> Response:
     payload = _get_all_mutations()
+    cleaned_mutations = _sort_and_clean_mutations(payload)
+    for mutation in cleaned_mutations:
+        mutation["mutationData"] = _purge_ddb_pk_and_sk(mutation["mutationData"])
 
-    # Sort payload by mutation date, descending
-    sorted_data = _sort_list_by_nested_key(
-        source_list=payload, nested_key="SK", reverse=True
-    )
-    _purge_keys_from_response(sorted_data)
+        try:
+            mutation["mutationData"]["new"] = _purge_ddb_pk_and_sk(
+                mutation["mutationData"]["new"]
+            )
+            mutation["mutationData"]["old"] = _purge_ddb_pk_and_sk(
+                mutation["mutationData"]["old"]
+            )
+        except KeyError:
+            # Okay if the 'new' or 'old' keys are not found, they're only present for mutations.
+            pass
 
     return Response(
         status_code=HTTPStatus.OK,
         content_type=content_types.APPLICATION_JSON,
-        body=json.dumps(sorted_data, cls=DecimalEncoder),
+        body=json.dumps(cleaned_mutations, cls=DecimalEncoder),
         compress=True,
     )
 
 
-def _purge_keys_from_response(data: Union[List, Dict]) -> None:
+def _sort_and_clean_mutations(mutations: List) -> List:
+    """Sort mutations by timestamp, and remove unnecessary keys"""
+
+    # Sort payload by mutation date, descending
+    sorted_data = _sort_list_by_nested_key(
+        source_list=mutations, nested_key="SK", reverse=True
+    )
+    # Set the mutationDateTime field
+    for item in sorted_data:
+        item["mutationDateTime"] = item["SK"]
+
+    return sorted_data
+
+
+def _purge_ddb_pk_and_sk(data: Union[List, Dict]) -> Union[List, Dict]:
     """Remove keys from the response that are not needed"""
-    if isinstance(data, list):
-        for item in data:
+    data_copy = deepcopy(data)
+    if isinstance(data_copy, list):
+        for item in data_copy:
             item.pop("PK", None)
             item.pop("SK", None)
-    elif isinstance(data, dict):
-        data.pop("PK", None)
-        data.pop("SK", None)
+    elif isinstance(data_copy, dict):
+        data_copy.pop("PK", None)
+        data_copy.pop("SK", None)
+
+    return data_copy
 
 
 def _sort_list_by_nested_key(source_list, nested_key, reverse=False):
