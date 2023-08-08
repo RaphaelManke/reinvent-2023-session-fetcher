@@ -1,5 +1,6 @@
 from aws_cdk import (
     Duration,
+    aws_scheduler as scheduler,
     aws_events as events,
     aws_lambda as lambda_,
     aws_dynamodb as dynamodb,
@@ -15,6 +16,7 @@ class EventGenerator(Construct):
         ddb_table: dynamodb.Table,
         event_bus: events.EventBus,
         common_layer: lambda_.LayerVersion,
+        fetcher_schedule: scheduler.CfnSchedule,
         **kwargs
     ):
         super().__init__(scope, id, **kwargs)
@@ -46,3 +48,6 @@ class EventGenerator(Construct):
 
         event_bus.grant_all_put_events(function)
         ddb_table.grant_stream_read(function)
+
+        # Don't start the scheduler before the EventGeneratorFunction is ready.
+        fetcher_schedule.add_dependency(function.node.default_child)

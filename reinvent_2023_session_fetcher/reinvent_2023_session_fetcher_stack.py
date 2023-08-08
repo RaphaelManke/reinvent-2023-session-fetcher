@@ -20,7 +20,7 @@ class Reinvent2023SessionFetcherStack(Stack):
             id="Storage",
         )
 
-        Fetcher(
+        fetcher = Fetcher(
             scope=self,
             id="Fetcher",
             credential_secret=storage.credentials_secret,
@@ -31,6 +31,7 @@ class Reinvent2023SessionFetcherStack(Stack):
         messaging = Messaging(
             scope=self,
             id="Messaging",
+            fetcher_schedule=fetcher.schedule,
         )
 
         EventGenerator(
@@ -39,6 +40,7 @@ class Reinvent2023SessionFetcherStack(Stack):
             ddb_table=storage.table,
             event_bus=messaging.event_bus,
             common_layer=storage.common_layer,
+            fetcher_schedule=fetcher.schedule,
         )
 
         DdbUpdateWriter(
@@ -47,6 +49,7 @@ class Reinvent2023SessionFetcherStack(Stack):
             ddb_table=storage.table,
             event_bus=messaging.event_bus,
             common_layer=storage.common_layer,
+            fetcher_schedule=fetcher.schedule,
         )
 
         RestApi(
