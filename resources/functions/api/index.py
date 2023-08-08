@@ -1,6 +1,6 @@
 from decimal import Decimal
 from http import HTTPStatus
-from typing import List, Dict
+from typing import List, Dict, Union
 import boto3
 import json
 import os
@@ -40,10 +40,17 @@ def lambda_handler(event: dict, context: LambdaContext) -> dict:
 @app.get("/sessions")
 def get_sessions() -> Response:
     payload = _get_all_sessions()
+
+    # Sort payload by session id, ascending
+    sorted_data = _sort_list_by_nested_key(
+        source_list=payload, nested_key="SK", reverse=False
+    )
+    _purge_keys_from_response(sorted_data)
+
     return Response(
         status_code=HTTPStatus.OK,
         content_type=content_types.APPLICATION_JSON,
-        body=json.dumps(payload, cls=DecimalEncoder),
+        body=json.dumps(sorted_data, cls=DecimalEncoder),
         compress=True,
     )
 
@@ -52,6 +59,8 @@ def get_sessions() -> Response:
 def get_session(session_id: str) -> Response:
     try:
         payload = _get_session(session_id)
+        _purge_keys_from_response(payload)
+
         return Response(
             status_code=HTTPStatus.OK,
             content_type=content_types.APPLICATION_JSON,
@@ -72,9 +81,11 @@ def get_session(session_id: str) -> Response:
 def get_session(session_id) -> Response:
     payload = _get_session_history(session_id)
 
-    # sort payload by mutation date, descending
-    nested_key = lambda x: x["SK"]
-    sorted_data = sorted(payload, key=nested_key, reverse=True)
+    # Sort payload by mutation date, descending
+    sorted_data = _sort_list_by_nested_key(
+        source_list=payload, nested_key="SK", reverse=True
+    )
+    _purge_keys_from_response(sorted_data)
 
     return Response(
         status_code=HTTPStatus.OK,
@@ -87,12 +98,45 @@ def get_session(session_id) -> Response:
 @app.get("/mutations")
 def get_mutations() -> Response:
     payload = _get_all_mutations()
+
+    # Sort payload by mutation date, descending
+    sorted_data = _sort_list_by_nested_key(
+        source_list=payload, nested_key="SK", reverse=True
+    )
+    _purge_keys_from_response(sorted_data)
+
     return Response(
         status_code=HTTPStatus.OK,
         content_type=content_types.APPLICATION_JSON,
-        body=json.dumps(payload, cls=DecimalEncoder),
+        body=json.dumps(sorted_data, cls=DecimalEncoder),
         compress=True,
     )
+
+
+def _purge_keys_from_response(data: Union[List, Dict]) -> None:
+    """Remove keys from the response that are not needed"""
+    if isinstance(data, list):
+        for item in data:
+            item.pop("PK", None)
+            item.pop("SK", None)
+    elif isinstance(data, dict):
+        data.pop("PK", None)
+        data.pop("SK", None)
+
+
+def _sort_list_by_nested_key(source_list, nested_key, reverse=False):
+    """Sort a list of dictionaries by a nested key"""
+    if not isinstance(source_list, list):
+        raise TypeError(f"Can only sort lists, not {type(source_list)}")
+
+    try:
+        nested_key_getter = lambda x: x[nested_key]
+        sorted_data = sorted(source_list, key=nested_key_getter, reverse=reverse)
+    except Exception as exc:
+        print(f"Failed to sort list: {type(exc).__name__}: {str(exc)}")
+        return source_list
+
+    return sorted_data
 
 
 def _get_all_sessions() -> List:
