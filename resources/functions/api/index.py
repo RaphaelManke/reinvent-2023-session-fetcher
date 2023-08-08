@@ -48,10 +48,11 @@ def get_sessions() -> Response:
     )
     _purge_ddb_pk_and_sk(sorted_data)
 
+    response = {"sessions": sorted_data}
     return Response(
         status_code=HTTPStatus.OK,
         content_type=content_types.APPLICATION_JSON,
-        body=json.dumps(sorted_data, cls=DecimalEncoder),
+        body=json.dumps(response, cls=DecimalEncoder),
         compress=True,
     )
 
@@ -86,10 +87,11 @@ def get_session_history(session_id) -> Response:
         _purge_ddb_pk_and_sk(mutation)
         _purge_ddb_pk_and_sk(mutation["mutationData"])
 
+    response = {"mutations": cleaned_mutations}
     return Response(
         status_code=HTTPStatus.OK,
         content_type=content_types.APPLICATION_JSON,
-        body=json.dumps(cleaned_mutations, cls=DecimalEncoder),
+        body=json.dumps(response, cls=DecimalEncoder),
         compress=True,
     )
 
@@ -109,10 +111,11 @@ def get_mutations() -> Response:
             # Okay if the 'new' or 'old' keys are not found, they're only present for mutations.
             pass
 
+    response = {"mutations": cleaned_mutations}
     return Response(
         status_code=HTTPStatus.OK,
         content_type=content_types.APPLICATION_JSON,
-        body=json.dumps(cleaned_mutations, cls=DecimalEncoder),
+        body=json.dumps(response, cls=DecimalEncoder),
         compress=True,
     )
 

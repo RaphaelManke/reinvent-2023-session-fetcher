@@ -38,7 +38,7 @@ class EventGenerator(Construct):
         function.add_event_source_mapping(
             id="DynamoDBMapping",
             event_source_arn=ddb_table.table_stream_arn,
-            starting_position=lambda_.StartingPosition.LATEST,
+            starting_position=lambda_.StartingPosition.TRIM_HORIZON,
             filters=[  # Only trigger on changes to 'ReInventSession' items
                 lambda_.FilterCriteria.filter(
                     {"dynamodb": {"Keys": {"PK": {"S": ["ReInventSession"]}}}}
