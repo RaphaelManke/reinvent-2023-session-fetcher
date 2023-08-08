@@ -5,3 +5,4 @@ deepdiff==6.3.*
 pydantic==2.1.*
 pytest==7.4.*
 requests==2.31.*
+freezegun==1.2.*
