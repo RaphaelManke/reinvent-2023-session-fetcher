@@ -20,6 +20,7 @@ class Storage(Construct):
             ),
             sort_key=dynamodb.Attribute(name="SK", type=dynamodb.AttributeType.STRING),
             stream=dynamodb.StreamViewType.NEW_AND_OLD_IMAGES,
+            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
         )
 
         # Secret for the Reinvent website user credentials
