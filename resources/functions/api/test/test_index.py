@@ -28,6 +28,7 @@ class TestApi:
                 "sessionID": "CMP201",
                 "PK": "SessionMutation",
                 "mutationType": "SessionAdded",
+                "mutationTitle": "Advancing generative AI innovation with Amazon EC2 accelerated compute",
                 "mutationData": {
                     "level": "200",
                     "topics": ["AI/ML", "Compute"],
@@ -68,6 +69,7 @@ class TestApi:
                 "sessionID": "SVS309",
                 "PK": "SessionMutation",
                 "mutationType": "SessionAdded",
+                "mutationTitle": "Improve productivity by shifting more responsibility to developers",
                 "mutationData": {
                     "level": "300",
                     "topics": ["Serverless Compute"],
@@ -459,6 +461,7 @@ class TestApi:
                 {
                     "sessionID": "SVS309",
                     "mutationType": "SessionAdded",
+                    "mutationTitle": "Improve productivity by shifting more responsibility to developers",
                     "mutationData": {
                         "level": "300",
                         "topics": ["Serverless Compute"],
@@ -486,10 +489,8 @@ class TestApi:
                         "thirdPartyID": "SVS309",
                         "industries": [],
                         "sessionUid": "BD8998F7-BD38-474F-A5F9-44CDF5502BF4",
-                        "SK": "SVS309",
                         "sessionType": "Breakout Session",
                         "scheduleTrackUid": "CEDEEA9B-CDE9-ED11-81DB-A4AC1C44CA4E",
-                        "PK": "ReInventSession",
                         "areas_of_interest": [],
                     },
                     "mutationDateTime": "2023-08-07T21:12:27.901818+00:00",
@@ -497,6 +498,7 @@ class TestApi:
                 {
                     "sessionID": "CMP201",
                     "mutationType": "SessionAdded",
+                    "mutationTitle": "Advancing generative AI innovation with Amazon EC2 accelerated compute",
                     "mutationData": {
                         "level": "200",
                         "topics": ["AI/ML", "Compute"],
@@ -521,10 +523,8 @@ class TestApi:
                         "thirdPartyID": "CMP201",
                         "industries": ["Cross Industry"],
                         "sessionUid": "BC517DF0-1904-49B6-BB63-9D73CFBFF839",
-                        "SK": "CMP201",
                         "sessionType": "Breakout Session",
                         "scheduleTrackUid": "CEDEEA9B-CDE9-ED11-81DB-A4AC1C44CA4E",
-                        "PK": "ReInventSession",
                         "areas_of_interest": [
                             "Innovation on AWS",
                             "Cost Optimization",

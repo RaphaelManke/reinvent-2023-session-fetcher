@@ -103,13 +103,11 @@ def get_mutations() -> Response:
 
     for mutation in cleaned_mutations:
         _purge_ddb_pk_and_sk(mutation)
-
-        try:
+        _purge_ddb_pk_and_sk(mutation["mutationData"])
+        if "new" in mutation["mutationData"]:
             _purge_ddb_pk_and_sk(mutation["mutationData"]["new"])
+        if "old" in mutation["mutationData"]:
             _purge_ddb_pk_and_sk(mutation["mutationData"]["old"])
-        except:
-            # Okay if the 'new' or 'old' keys are not found, they're only present for mutations.
-            pass
 
     response = {"mutations": cleaned_mutations}
     return Response(
@@ -169,7 +167,7 @@ def _get_all_sessions() -> List:
         ExpressionAttributeNames={"#pk": "PK"},
         ExpressionAttributeValues={":val": {"S": "ReInventSession"}},
     )
-    return _deserialize_list(response_iterator)
+    return _deserialize_ddb_query_paginator(response_iterator)
 
 
 def _get_session(session_id: str) -> Dict:
@@ -209,7 +207,7 @@ def _get_session_history(session_id) -> List:
         ExpressionAttributeNames={"#pk": "PK"},
         ExpressionAttributeValues={":val": {"S": f"{session_id}#SessionMutation"}},
     )
-    return _deserialize_list(response_iterator)
+    return _deserialize_ddb_query_paginator(response_iterator)
 
 
 def _get_all_mutations() -> List:
@@ -221,10 +219,21 @@ def _get_all_mutations() -> List:
         ExpressionAttributeNames={"#pk": "PK"},
         ExpressionAttributeValues={":val": {"S": "SessionMutation"}},
     )
-    return _deserialize_list(response_iterator)
+    response_list = _deserialize_ddb_query_paginator(response_iterator)
+    for item in response_list:
+        session_title = None
+        if item["mutationType"] == "SessionUpdated":
+            session_title = item["mutationData"]["new"]["title"]
+        else:
+            session_title = item["mutationData"]["title"]
+
+        item["sessionTitle"] = session_title
+        print(session_title)
+
+    return response_list
 
 
-def _deserialize_list(response_iterator):
+def _deserialize_ddb_query_paginator(response_iterator):
     item_list = []
     # Iterate through the paginated results
     for page in response_iterator:

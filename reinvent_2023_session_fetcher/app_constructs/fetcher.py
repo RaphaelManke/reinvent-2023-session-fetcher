@@ -68,7 +68,7 @@ class Fetcher(Construct):
         self.schedule = scheduler.CfnSchedule(
             scope=self,
             id="FetcherSchedule",
-            schedule_expression="rate(1 minute)",
+            schedule_expression="rate(5 minute)",
             target=scheduler.CfnSchedule.TargetProperty(
                 arn=function.function_arn, role_arn=scheduler_role.role_arn
             ),
