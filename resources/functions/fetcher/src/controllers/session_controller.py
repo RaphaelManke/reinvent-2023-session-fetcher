@@ -154,6 +154,8 @@ class SessionController:
                 else:
                     not_updated_sessions.append(new_session.sessionUid)
 
+        print(f"Found {len(added_sessions)} new sessions")
+        print(f"Found {len(removed_sessions)} removed sessions")
         print(f"Found {len(not_updated_sessions)} sessions without changes")
 
         return ReInventSessionListDiff(
