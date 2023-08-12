@@ -1,5 +1,6 @@
 from aws_cdk import (
     Duration,
+    aws_scheduler as scheduler,
     aws_dynamodb as dynamodb,
     aws_events as events,
     aws_events_targets as targets,
@@ -16,6 +17,7 @@ class DdbUpdateWriter(Construct):
         ddb_table: dynamodb.Table,
         event_bus: events.EventBus,
         common_layer: lambda_.LayerVersion,
+        fetcher_schedule: scheduler.CfnSchedule,
         **kwargs
     ):
         super().__init__(scope, id, **kwargs)
@@ -39,7 +41,7 @@ class DdbUpdateWriter(Construct):
         )
         ddb_table.grant_write_data(function)
 
-        events.Rule(
+        rule = events.Rule(
             scope=self,
             id="DdbUpdateRule",
             event_bus=event_bus,
@@ -53,3 +55,7 @@ class DdbUpdateWriter(Construct):
                 ],
             ),
         )
+
+        # Don't start the scheduler before the Event listener and rule are ready.
+        fetcher_schedule.add_dependency(function.node.default_child)
+        fetcher_schedule.add_dependency(rule.node.default_child)

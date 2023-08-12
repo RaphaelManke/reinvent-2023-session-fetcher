@@ -1,7 +1,4 @@
 from decimal import Decimal
-import sys
-
-import pytest
 from unittest.mock import MagicMock
 from copy import deepcopy
 
@@ -9,17 +6,11 @@ from copy import deepcopy
 class TestSessionController:
     """Tests for the SessionController."""
 
-    @pytest.fixture(autouse=True)
-    def function_path(self):
-        sys.path.append("resources/functions/fetcher")
-        yield
-        sys.path.remove("resources/functions/fetcher")
-
     @staticmethod
     def test_get_session_from_list_by_id_not_found():
         # 1. ARRANGE
-        from models import ReInventSession, ReInventSessionTag
-        from controllers.session_controller import SessionController
+        from ...models import ReInventSession, ReInventSessionTag
+        from ...controllers.session_controller import SessionController
 
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = []
@@ -59,8 +50,8 @@ class TestSessionController:
     @staticmethod
     def test_get_session_from_list_by_id_found():
         # 1. ARRANGE
-        from models import ReInventSession, ReInventSessionTag
-        from controllers.session_controller import SessionController
+        from ...models import ReInventSession, ReInventSessionTag
+        from ...controllers.session_controller import SessionController
 
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = []
@@ -100,8 +91,8 @@ class TestSessionController:
     @staticmethod
     def test_get_session_by_id_not_found():
         # 1. ARRANGE
-        from models import ReInventSession, ReInventSessionTag
-        from controllers.session_controller import SessionController
+        from ...models import ReInventSession, ReInventSessionTag
+        from ...controllers.session_controller import SessionController
 
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = [
@@ -137,8 +128,8 @@ class TestSessionController:
     @staticmethod
     def test_get_session_by_id_found():
         # 1. ARRANGE
-        from models import ReInventSession, ReInventSessionTag
-        from controllers.session_controller import SessionController
+        from ...models import ReInventSession, ReInventSessionTag
+        from ...controllers.session_controller import SessionController
 
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = [
@@ -176,8 +167,8 @@ class TestSessionController:
     @staticmethod
     def test_get_session_diff_no_change():
         # 1. ARRANGE
-        from models import ReInventSession, ReInventSessionTag
-        from controllers.session_controller import SessionController
+        from ...models import ReInventSession, ReInventSessionTag
+        from ...controllers.session_controller import SessionController
 
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = []
@@ -215,8 +206,8 @@ class TestSessionController:
     @staticmethod
     def test_get_session_diff_order_change():
         # 1. ARRANGE
-        from models import ReInventSession, ReInventSessionTag
-        from controllers.session_controller import SessionController
+        from ...models import ReInventSession, ReInventSessionTag
+        from ...controllers.session_controller import SessionController
 
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = []
@@ -273,8 +264,12 @@ class TestSessionController:
     @staticmethod
     def test_get_session_diff_field_change():
         # 1. ARRANGE
-        from models import ReInventSession, ReInventSessionTag, ReInventSessionFieldDiff
-        from controllers.session_controller import SessionController
+        from ...models import (
+            ReInventSession,
+            ReInventSessionTag,
+            ReInventSessionFieldDiff,
+        )
+        from ...controllers.session_controller import SessionController
 
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = []
@@ -322,8 +317,12 @@ class TestSessionController:
     @staticmethod
     def test_get_session_diff_field_add():
         # 1. ARRANGE
-        from models import ReInventSession, ReInventSessionFieldDiff, ReInventSessionTag
-        from controllers.session_controller import SessionController
+        from ...models import (
+            ReInventSession,
+            ReInventSessionFieldDiff,
+            ReInventSessionTag,
+        )
+        from ...controllers.session_controller import SessionController
 
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = []
@@ -394,8 +393,12 @@ class TestSessionController:
     @staticmethod
     def test_get_session_diff_field_change_and_add():
         # 1. ARRANGE
-        from models import ReInventSession, ReInventSessionFieldDiff, ReInventSessionTag
-        from controllers.session_controller import SessionController
+        from ...models import (
+            ReInventSession,
+            ReInventSessionFieldDiff,
+            ReInventSessionTag,
+        )
+        from ...controllers.session_controller import SessionController
 
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = []
@@ -470,8 +473,12 @@ class TestSessionController:
     @staticmethod
     def test_get_session_diff_field_change_double():
         # 1. ARRANGE
-        from models import ReInventSession, ReInventSessionFieldDiff, ReInventSessionTag
-        from controllers.session_controller import SessionController
+        from ...models import (
+            ReInventSession,
+            ReInventSessionFieldDiff,
+            ReInventSessionTag,
+        )
+        from ...controllers.session_controller import SessionController
 
         SessionController._init_from_db = MagicMock()
         SessionController._init_from_db.return_value = []
@@ -521,14 +528,14 @@ class TestSessionController:
     @staticmethod
     def test_generate_diff_add_remove_update():
         # 1. ARRANGE
-        from models import (
+        from ...models import (
             ReInventSession,
             ReInventSessionTag,
             ReInventSessionListDiff,
             ReInventSessionFieldDiff,
             ReInventSessionDiff,
         )
-        from controllers.session_controller import SessionController
+        from ...controllers.session_controller import SessionController
 
         session_a_1 = ReInventSession(
             sessionType="standard",
@@ -780,8 +787,12 @@ class TestSessionController:
     @staticmethod
     def test_generate_diff_add_only():
         # 1. ARRANGE
-        from models import ReInventSession, ReInventSessionTag, ReInventSessionListDiff
-        from controllers.session_controller import SessionController
+        from ...models import (
+            ReInventSession,
+            ReInventSessionTag,
+            ReInventSessionListDiff,
+        )
+        from ...controllers.session_controller import SessionController
 
         session_a = ReInventSession(
             sessionType="standard",
@@ -896,8 +907,12 @@ class TestSessionController:
     @staticmethod
     def test_generate_diff_remove_only():
         # 1. ARRANGE
-        from models import ReInventSession, ReInventSessionTag, ReInventSessionListDiff
-        from controllers.session_controller import SessionController
+        from ...models import (
+            ReInventSession,
+            ReInventSessionTag,
+            ReInventSessionListDiff,
+        )
+        from ...controllers.session_controller import SessionController
 
         session_a = ReInventSession(
             sessionType="standard",
@@ -1012,14 +1027,14 @@ class TestSessionController:
     @staticmethod
     def test_generate_diff_update_tags_only():
         # 1. ARRANGE
-        from models import (
+        from ...models import (
             ReInventSession,
             ReInventSessionTag,
             ReInventSessionListDiff,
             ReInventSessionDiff,
             ReInventSessionFieldDiff,
         )
-        from controllers.session_controller import SessionController
+        from ...controllers.session_controller import SessionController
 
         session_a_1 = ReInventSession(
             sessionType="standard",
@@ -1208,14 +1223,14 @@ class TestSessionController:
     @staticmethod
     def test_generate_diff_update_only():
         # 1. ARRANGE
-        from models import (
+        from ...models import (
             ReInventSession,
             ReInventSessionTag,
             ReInventSessionListDiff,
             ReInventSessionDiff,
             ReInventSessionFieldDiff,
         )
-        from controllers.session_controller import SessionController
+        from ...controllers.session_controller import SessionController
 
         session_a_1 = ReInventSession(
             sessionType="standard",

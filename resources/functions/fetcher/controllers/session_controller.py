@@ -6,7 +6,7 @@ import re
 from deepdiff import DeepDiff
 from boto3.dynamodb.types import TypeDeserializer
 
-from models import (
+from ..models import (
     ReInventSession,
     ReInventSessionListDiff,
     ReInventSessionDiff,
